@@ -6,74 +6,124 @@ This document defines the shared signals between the game logic modules and the 
 
 - Screen width: 640
 - Screen height: 480
-- `x = 0` is the left side
-- `y = 0` is the top side
-- Larger `y` means lower position on the screen
+- x = 0 is the left side
+- y = 0 is the top side
+- Larger y means lower position on the screen
 
 ## Game State
 
-```verilog
 game_state[1:0]
 
-input wire [1:0] game_state,
-input wire       dead,
-input wire [7:0] score,
+State encoding:
+- 2'd0: S_IDLE
+- 2'd1: S_PLAY
+- 2'd2: S_GAME_OVER
 
-input wire [9:0] bird_x,
-input wire [8:0] bird_y,
+Renderer usage:
+- S_IDLE: show start screen or still scene
+- S_PLAY: draw normal game scene
+- S_GAME_OVER: draw game over screen
 
-input wire [9:0] pipe1_x,
-input wire [8:0] pipe1_gap_y,
-input wire [9:0] pipe2_x,
+## Main Signals for Renderer
 
-bird_area =
-    (pixel_x >= bird_x) &&
-    (pixel_x <  bird_x + 16) &&
-    (pixel_y >= bird_y) &&
-    (pixel_y <  bird_y + 16);
+Inputs from game logic:
+- game_state[1:0]
+- dead
+- score[7:0]
+- bird_x[9:0]
+- bird_y[8:0]
+- pipe1_x[9:0]
+- pipe1_gap_y[8:0]
+- pipe2_x[9:0]
+- pipe2_gap_y[8:0]
+- pipe3_x[9:0]
+- pipe3_gap_y[8:0]
 
-pipe1_x[9:0]
-pipe1_gap_y[8:0]
+## Bird
 
-pipe2_x[9:0]
-pipe2_gap_y[8:0]
+Current design:
+- bird_x = 100
+- bird size = 16 x 16
 
-pipe3_x[9:0]
-pipe3_gap_y[8:0]
+Renderer idea:
+- Draw the bird when pixel_x is between bird_x and bird_x + 16
+- Draw the bird when pixel_y is between bird_y and bird_y + 16
 
-in_pipe_x =
-    (pixel_x >= pipeX_x) &&
-    (pixel_x <  pipeX_x + 40);
+## Pipes
 
-in_pipe_y =
-    (pixel_y < pipeX_gap_y) ||
-    (pixel_y >= pipeX_gap_y + 120);
+Current design:
+- pipe width = 40
+- gap height = 120
 
-pipe_area = in_pipe_x && in_pipe_y;
+Each pipe has:
+- pipeX_x: left x-coordinate of the pipe
+- pipeX_gap_y: top y-coordinate of the gap
 
-ground_area = (pixel_y >= 440);
+Pipe signals:
+- pipe1_x[9:0]
+- pipe1_gap_y[8:0]
+- pipe2_x[9:0]
+- pipe2_gap_y[8:0]
+- pipe3_x[9:0]
+- pipe3_gap_y[8:0]
 
-| Item           | Value   |
-| -------------- | ------- |
-| VGA width      | 640     |
-| VGA height     | 480     |
-| Bird size      | 16 x 16 |
-| Bird x         | 100     |
-| Pipe width     | 40      |
-| Gap height     | 120     |
-| Ground height  | 40      |
-| Ground y start | 440     |
+Gap range:
+- from pipeX_gap_y
+- to pipeX_gap_y + 120
 
-output wire [3:0] vga_r,
-output wire [3:0] vga_g,
-output wire [3:0] vga_b,
-output wire       vga_hsync,
-output wire       vga_vsync
+Renderer idea:
+- Draw pipe body when pixel_x is between pipeX_x and pipeX_x + 40
+- Do not draw pipe inside the gap area
+- Gap area is from pipeX_gap_y to pipeX_gap_y + 120
 
-Reset: LEDs off
-Press S0: LD0 on, game enters PLAY
-After falling: LD1 + LD2 on, game enters GAME_OVER
-Hold S2: LD3 on
-input wire [8:0] pipe2_gap_y,
-input wire [9:0] pipe3_x,
-input wire [8:0] pipe3_gap_y
+## Ground
+
+Current design:
+- ground height = 40
+- ground starts at y = 440
+
+Renderer idea:
+- Draw ground when pixel_y >= 440
+
+## Shared Constants
+
+- VGA width: 640
+- VGA height: 480
+- Bird size: 16 x 16
+- Bird x: 100
+- Pipe width: 40
+- Gap height: 120
+- Ground height: 40
+- Ground y start: 440
+
+## VGA Renderer Outputs
+
+Recommended VGA output names:
+- vga_r[3:0]
+- vga_g[3:0]
+- vga_b[3:0]
+- vga_hsync
+- vga_vsync
+
+These names match constraints/ego1_vga_reference.xdc.
+
+## LED Board Test Result
+
+Game logic has passed EGO1 LED board test.
+
+Button mapping:
+- S4: reset
+- S0: start
+- S2: flap
+
+LED mapping:
+- LD0: game_state[0]
+- LD1: game_state[1]
+- LD2: dead
+- LD3: btnU
+
+Observed behavior:
+- Reset: LEDs off
+- Press S0: LD0 on, game enters PLAY
+- After falling: LD1 + LD2 on, game enters GAME_OVER
+- Hold S2: LD3 on
