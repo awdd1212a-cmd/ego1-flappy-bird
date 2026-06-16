@@ -35,7 +35,13 @@
 - PLAY
 - GAME_OVER
 
-這代表目前遊戲核心邏輯已經可以正常運作。VGA timing 第一版也已完成，並通過 Vivado behavioral simulation；彩條測試 top 已完成 bitstream 產生並成功上板顯示。目前已新增 VGA renderer 與最終 top_vga，且 top_vga bitstream 已成功產生。下一階段重點是上板確認實際遊戲畫面。
+這代表目前遊戲核心邏輯已經可以正常運作。VGA timing 第一版也已完成，並通過 Vivado behavioral simulation；彩條測試 top 已完成 bitstream 產生並成功上板顯示。目前已新增 VGA renderer 與最終 top_vga，top_vga bitstream 已成功產生並上板顯示出遊戲畫面。下一階段重點是改善鳥的外觀與調整遊戲難度，讓展示時更清楚、更好玩。
+
+目前已知需要改善：
+
+- 鳥目前仍偏向矩形方塊，需要改成更像鳥的簡單 pixel-art 造型
+- 遊戲難度偏高，需要放大 gap、降低 pipe speed，並調整 flap / fall 手感
+- IDLE / GAME_OVER 的畫面提示仍偏簡單，後續可再加強辨識度
 
 ## 系統架構
 
@@ -331,13 +337,13 @@ constraints/ego1_vga_color_test.xdc
 
 ## 下一步
 
-下一階段主要是 top_vga 上板測試。VGA to HDMI 轉換器與擷取卡已確認可以收到 EGO1 輸出的彩條畫面。
+下一階段主要是視覺與遊戲手感調整。VGA to HDMI 轉換器與擷取卡已確認可以收到 EGO1 輸出的彩條畫面，top_vga 也已能顯示遊戲場景。
 
 建議實作順序：
 
-1. 將 C:/ego1_top_vga_build/bitstream/top_vga.bit 燒錄到 EGO1
-2. 在 OBS 確認 sky、ground、bird、pipes 是否正常顯示
-3. 上板測試 start、flap、collision、GAME_OVER
+1. 將 bird 從單純方塊改成簡單 pixel-art 造型，例如身體、嘴巴、眼睛、翅膀
+2. 調整遊戲難度，例如放大 pipe gap、降低 pipe speed、調整 flap / fall step
+3. 重新產生 top_vga.bit 並上板測試操作手感
 4. 依照實際畫面調整顏色、尺寸或狀態提示
 5. 補上 README、測試紀錄與展示結果
 

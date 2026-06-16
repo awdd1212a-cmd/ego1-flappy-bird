@@ -152,6 +152,15 @@ Full VGA game top implementation result:
   - 0 errors
   - 0 critical warnings
   - bitstream generation completed successfully
+- Board display test:
+  - top_vga successfully displays a game scene through OBS
+  - VGA path remains stable after switching from color bars to the game renderer
+
+Current top_vga observations:
+
+- The renderer is functional, but the bird still looks like a simple rectangular block
+- The current gameplay is too difficult for demonstration
+- The next iteration should focus on visual clarity and easier game tuning rather than new major features
 
 ## Important Notes
 
@@ -224,7 +233,7 @@ The board version runs close to 60 Hz based on the 100 MHz EGO1 system clock.
 
 ## Next Step
 
-Next task is full VGA game board testing.
+Next task is VGA game polish and difficulty tuning.
 
 The VGA output path has been confirmed with:
 
@@ -232,17 +241,19 @@ The VGA output path has been confirmed with:
 - rtl/top_vga_color_test.v
 - constraints/ego1_vga_color_test.xdc
 
-Use this bitstream for the next board test:
+Recommended next changes:
 
-- C:/ego1_top_vga_build/bitstream/top_vga.bit
-
-Expected board result:
-
-- sky background
-- brown ground band
-- yellow bird with border
-- green pipes
-- simple IDLE / GAME_OVER visual markers
+- Make the bird look more like a bird using simple pixel-art regions:
+  - yellow body
+  - orange beak
+  - white eye
+  - black pupil
+  - darker wing
+- Tune gameplay for easier demonstration:
+  - increase pipe gap
+  - reduce pipe speed
+  - adjust flap and fall steps
+- Regenerate C:/ego1_top_vga_build/bitstream/top_vga.bit and test again on EGO1
 
 The VGA renderer should use the game logic signals listed in:
 
