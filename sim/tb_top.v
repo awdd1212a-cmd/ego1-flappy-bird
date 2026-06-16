@@ -149,7 +149,7 @@ module tb_top;
         $display("Final led        = %b", led);
         $display("=================================");
 
-        $stop;
+        $finish;
     end
 
 endmodule
