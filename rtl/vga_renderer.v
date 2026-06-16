@@ -26,10 +26,10 @@ module vga_renderer(
     localparam S_PLAY      = 2'd1;
     localparam S_GAME_OVER = 2'd2;
 
-    localparam [9:0] BIRD_W = 10'd16;
-    localparam [9:0] BIRD_H = 10'd16;
+    localparam [9:0] BIRD_W = 10'd24;
+    localparam [9:0] BIRD_H = 10'd24;
     localparam [9:0] PIPE_W = 10'd40;
-    localparam [9:0] GAP_H  = 10'd120;
+    localparam [9:0] GAP_H  = 10'd180;
     localparam [9:0] GROUND_Y = 10'd440;
 
     wire [9:0] bird_y_10;
@@ -45,6 +45,10 @@ module vga_renderer(
     wire in_ground;
     wire in_bird_body;
     wire in_bird_border;
+    wire in_bird_beak;
+    wire in_bird_eye;
+    wire in_bird_pupil;
+    wire in_bird_wing;
     wire in_pipe1;
     wire in_pipe2;
     wire in_pipe3;
@@ -67,6 +71,30 @@ module vga_renderer(
          (pixel_x == bird_x + BIRD_W - 10'd1) ||
          (pixel_y == bird_y_10) ||
          (pixel_y == bird_y_10 + BIRD_H - 10'd1));
+
+    assign in_bird_beak =
+        (pixel_x >= bird_x + 10'd20) &&
+        (pixel_x < bird_x + 10'd28) &&
+        (pixel_y >= bird_y_10 + 10'd9) &&
+        (pixel_y < bird_y_10 + 10'd15);
+
+    assign in_bird_eye =
+        (pixel_x >= bird_x + 10'd14) &&
+        (pixel_x < bird_x + 10'd20) &&
+        (pixel_y >= bird_y_10 + 10'd5) &&
+        (pixel_y < bird_y_10 + 10'd11);
+
+    assign in_bird_pupil =
+        (pixel_x >= bird_x + 10'd17) &&
+        (pixel_x < bird_x + 10'd20) &&
+        (pixel_y >= bird_y_10 + 10'd7) &&
+        (pixel_y < bird_y_10 + 10'd10);
+
+    assign in_bird_wing =
+        (pixel_x >= bird_x + 10'd4) &&
+        (pixel_x < bird_x + 10'd13) &&
+        (pixel_y >= bird_y_10 + 10'd13) &&
+        (pixel_y < bird_y_10 + 10'd20);
 
     assign in_pipe1 =
         (pixel_x >= pipe1_x) &&
@@ -112,9 +140,25 @@ module vga_renderer(
             vga_r = 4'hF;
             vga_g = 4'hD;
             vga_b = 4'h3;
+        end else if (in_bird_pupil) begin
+            vga_r = 4'h0;
+            vga_g = 4'h0;
+            vga_b = 4'h0;
+        end else if (in_bird_eye) begin
+            vga_r = 4'hF;
+            vga_g = 4'hF;
+            vga_b = 4'hF;
+        end else if (in_bird_beak) begin
+            vga_r = 4'hF;
+            vga_g = 4'h7;
+            vga_b = 4'h1;
         end else if (in_bird_border) begin
             vga_r = 4'h1;
             vga_g = 4'h1;
+            vga_b = 4'h1;
+        end else if (in_bird_wing) begin
+            vga_r = 4'hC;
+            vga_g = 4'h8;
             vga_b = 4'h1;
         end else if (in_bird_body) begin
             vga_r = 4'hF;

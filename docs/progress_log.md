@@ -158,9 +158,31 @@ Full VGA game top implementation result:
 
 Current top_vga observations:
 
-- The renderer is functional, but the bird still looks like a simple rectangular block
-- The current gameplay is too difficult for demonstration
-- The next iteration should focus on visual clarity and easier game tuning rather than new major features
+- The renderer is functional and displays through OBS
+- The first game scene was visible, but the bird was not visually clear enough
+- The first gameplay tuning was too difficult for demonstration
+- The latest source now improves bird readability and lowers the difficulty
+
+Latest VGA polish changes:
+
+- Bird size increased from 16x16 to 24x24
+- Bird renderer now includes body, border, orange beak, white eye, black pupil, and darker wing
+- Pipe gap increased from 120 pixels to 180 pixels
+- Pipe speed reduced from 4 pixels per game tick to 2 pixels per game tick
+- Flap step increased from 28 to 34
+- Fall step reduced from 4 to 3
+
+Latest top_vga build result:
+
+- Top module: top_vga
+- Generated bitstream:
+  - C:/ego1_top_vga_build/bitstream/top_vga.bit
+- Vivado synthesis, implementation, routing, and bitstream generation completed successfully
+- Build result:
+  - 0 errors
+  - 0 critical warnings
+- Board test status:
+  - waiting for the latest tuned bitstream to be programmed and tested on EGO1
 
 ## Important Notes
 
@@ -233,7 +255,7 @@ The board version runs close to 60 Hz based on the 100 MHz EGO1 system clock.
 
 ## Next Step
 
-Next task is VGA game polish and difficulty tuning.
+Next task is latest tuned top_vga board testing.
 
 The VGA output path has been confirmed with:
 
@@ -241,19 +263,13 @@ The VGA output path has been confirmed with:
 - rtl/top_vga_color_test.v
 - constraints/ego1_vga_color_test.xdc
 
-Recommended next changes:
+Recommended next test steps:
 
-- Make the bird look more like a bird using simple pixel-art regions:
-  - yellow body
-  - orange beak
-  - white eye
-  - black pupil
-  - darker wing
-- Tune gameplay for easier demonstration:
-  - increase pipe gap
-  - reduce pipe speed
-  - adjust flap and fall steps
-- Regenerate C:/ego1_top_vga_build/bitstream/top_vga.bit and test again on EGO1
+- Program C:/ego1_top_vga_build/bitstream/top_vga.bit through Vivado Hardware Manager
+- Confirm the OBS display shows the larger bird with beak, eye, pupil, and wing
+- Confirm the pipe gap is easier to pass through
+- Confirm flap control feels playable rather than instantly dying
+- If needed, tune BIRD_SIZE, GAP_H, PIPE_SPEED, FLAP_STEP, and FALL_STEP again based on the actual board result
 
 The VGA renderer should use the game logic signals listed in:
 

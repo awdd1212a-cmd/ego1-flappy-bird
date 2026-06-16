@@ -19,11 +19,11 @@ module bird_ctrl(
     // Screen / bird constants
     localparam [9:0] BIRD_X_INIT = 10'd100;
     localparam [8:0] BIRD_Y_INIT = 9'd220;
-    localparam [4:0] BIRD_SIZE   = 5'd16;
+    localparam [4:0] BIRD_SIZE   = 5'd24;
 
     // Movement constants
-    localparam [8:0] FLAP_STEP = 9'd28;
-    localparam [8:0] FALL_STEP = 9'd4;
+    localparam [8:0] FLAP_STEP = 9'd34;
+    localparam [8:0] FALL_STEP = 9'd3;
 
     // Boundary
     localparam [8:0] TOP_LIMIT    = 9'd0;

@@ -15,7 +15,7 @@ module collision(
 );
 
     localparam [9:0] PIPE_W     = 10'd40;
-    localparam [8:0] PIPE_GAP_H = 9'd120;
+    localparam [8:0] PIPE_GAP_H = 9'd180;
     localparam [8:0] SCREEN_H   = 9'd480;
     localparam [8:0] GROUND_H   = 9'd40;
     localparam [8:0] GROUND_Y   = SCREEN_H - GROUND_H; // 440

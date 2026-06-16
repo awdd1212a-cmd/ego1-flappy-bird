@@ -20,7 +20,7 @@ module pipe_ctrl(
     // Screen / pipe constants
     localparam [9:0] SCREEN_W   = 10'd640;
     localparam [9:0] PIPE_W     = 10'd40;
-    localparam [8:0] GAP_H      = 9'd120;
+    localparam [8:0] GAP_H      = 9'd180;
 
     // Initial pipe positions. Some values start off-screen to the right.
     localparam [9:0] PIPE1_X_INIT = 10'd500;
@@ -33,7 +33,7 @@ module pipe_ctrl(
     localparam [8:0] PIPE3_GAP_Y_INIT = 9'd180;
 
     // Movement speed per game tick.
-    localparam [9:0] PIPE_SPEED = 10'd4;
+    localparam [9:0] PIPE_SPEED = 10'd2;
 
     // Recycle positions must fit in 10 bits.
     localparam [9:0] PIPE1_RECYCLE_X = 10'd700;
