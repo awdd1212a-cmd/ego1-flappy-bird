@@ -200,6 +200,25 @@ Latest bonus feature update:
 - Board test status:
   - waiting for EGO1 testing of the bonus display version
 
+Latest requested control/display update:
+
+- IDLE and GAME_OVER are being changed from solid color blocks to block-letter VGA text:
+  - IDLE shows START
+  - GAME_OVER shows GAME / OVER
+- Score logic is being changed to avoid overflow-based false scoring:
+  - pipe pass detection now compares previous and current pipe positions
+  - scoring rule is now every 3 passed pipes = +5 points
+- 4x4 keypad control RTL has been added:
+  - key 1 = start
+  - key 5 = flap
+  - key D = reset
+- top_vga now uses keypad_row[3:0] and keypad_col[3:0] instead of btnC and btnU
+- Important blocking item:
+  - the exact EGO1 header pins for the external 4x4 keypad still need to be filled into constraints/ego1_vga.xdc before a usable bitstream can be generated
+- Verification status:
+  - Vivado xvlog syntax check passed for the updated RTL
+  - full bitstream generation is intentionally blocked until keypad PACKAGE_PIN values are known
+
 ## Important Notes
 
 There are currently three top versions:

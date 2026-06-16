@@ -1,8 +1,7 @@
 module top_vga(
     input  wire       clk,
-    input  wire       rst,
-    input  wire       btnC,
-    input  wire       btnU,
+    input  wire [3:0] keypad_row,
+    output wire [3:0] keypad_col,
 
     output wire [3:0] vga_r,
     output wire [3:0] vga_g,
@@ -13,9 +12,16 @@ module top_vga(
     output wire [3:0] led
 );
 
+    wire rst;
+    wire key_start;
+    wire key_flap;
+    wire key_reset;
+    wire [3:0] key_code;
     wire start_pulse;
     wire flap_pulse;
     reg  flap_pending;
+    reg  [19:0] power_on_cnt = 20'd0;
+    reg         power_on_done = 1'b0;
 
     wire game_tick;
     wire video_on;
@@ -43,6 +49,16 @@ module top_vga(
 
     reg [20:0] tick_cnt;
 
+    assign rst = key_reset || !power_on_done;
+
+    always @(posedge clk) begin
+        if (!power_on_done) begin
+            power_on_cnt <= power_on_cnt + 20'd1;
+            if (power_on_cnt == 20'hFFFFF)
+                power_on_done <= 1'b1;
+        end
+    end
+
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             tick_cnt <= 21'd0;
@@ -68,11 +84,21 @@ module top_vga(
         end
     end
 
+    keypad_ctrl u_keypad_ctrl(
+        .clk(clk),
+        .row(keypad_row),
+        .col(keypad_col),
+        .key_start(key_start),
+        .key_flap(key_flap),
+        .key_reset(key_reset),
+        .key_code(key_code)
+    );
+
     button_ctrl u_button_ctrl(
         .clk(clk),
         .rst(rst),
-        .btn_start(btnC),
-        .btn_flap(btnU),
+        .btn_start(key_start),
+        .btn_flap(key_flap),
         .start_pulse(start_pulse),
         .flap_pulse(flap_pulse)
     );
@@ -170,6 +196,6 @@ module top_vga(
     assign led[0] = game_state[0];
     assign led[1] = game_state[1];
     assign led[2] = dead;
-    assign led[3] = btnU;
+    assign led[3] = key_flap;
 
 endmodule

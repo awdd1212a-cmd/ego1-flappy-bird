@@ -8,18 +8,36 @@ set_property PACKAGE_PIN P17 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
 create_clock -period 10.000 -name sys_clk [get_ports clk]
 
-# Buttons
-# S4 Reset
-set_property PACKAGE_PIN U4 [get_ports rst]
-set_property IOSTANDARD LVCMOS33 [get_ports rst]
-
-# S0 Start
-set_property PACKAGE_PIN R11 [get_ports btnC]
-set_property IOSTANDARD LVCMOS33 [get_ports btnC]
-
-# S2 Flap
-set_property PACKAGE_PIN R15 [get_ports btnU]
-set_property IOSTANDARD LVCMOS33 [get_ports btnU]
+# 4x4 Keypad
+# Current RTL mapping:
+#   1 = start
+#   5 = flap
+#   D = reset
+#
+# TODO: Fill these PACKAGE_PIN values based on the exact EGO1 header
+# used by the external 4x4 keypad.
+#
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_row[0]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[0]}]
+# set_property PULLUP true [get_ports {keypad_row[0]}]
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_row[1]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[1]}]
+# set_property PULLUP true [get_ports {keypad_row[1]}]
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_row[2]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[2]}]
+# set_property PULLUP true [get_ports {keypad_row[2]}]
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_row[3]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[3]}]
+# set_property PULLUP true [get_ports {keypad_row[3]}]
+#
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_col[0]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[0]}]
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_col[1]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[1]}]
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_col[2]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[2]}]
+# set_property PACKAGE_PIN <PIN> [get_ports {keypad_col[3]}]
+# set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[3]}]
 
 # VGA Red[3:0]
 set_property PACKAGE_PIN F5 [get_ports {vga_r[0]}]

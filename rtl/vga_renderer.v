@@ -61,8 +61,8 @@ module vga_renderer(
     wire in_pipe_highlight;
     wire in_cloud;
     wire in_ground_line;
-    wire in_game_over_bar;
-    wire in_idle_marker;
+    wire in_start_text;
+    wire in_game_text;
     wire in_score_tens;
     wire in_score_ones;
     wire in_score;
@@ -112,6 +112,101 @@ module vga_renderer(
                 (seg[2] && e) ||
                 (seg[1] && f) ||
                 (seg[0] && g);
+        end
+    endfunction
+
+    function letter_pixel;
+        input [3:0] letter;
+        input [9:0] dx;
+        input [9:0] dy;
+        reg top_seg;
+        reg mid_seg;
+        reg bot_seg;
+        reg left_top;
+        reg left_bot;
+        reg right_top;
+        reg right_bot;
+        reg diag_left;
+        reg diag_right;
+        begin
+            top_seg   = (dy < 10'd5) && (dx >= 10'd5) && (dx < 10'd23);
+            mid_seg   = (dy >= 10'd15) && (dy < 10'd20) && (dx >= 10'd5) && (dx < 10'd23);
+            bot_seg   = (dy >= 10'd31) && (dy < 10'd36) && (dx >= 10'd5) && (dx < 10'd23);
+            left_top  = (dx < 10'd5) && (dy >= 10'd5) && (dy < 10'd18);
+            left_bot  = (dx < 10'd5) && (dy >= 10'd18) && (dy < 10'd31);
+            right_top = (dx >= 10'd23) && (dx < 10'd28) && (dy >= 10'd5) && (dy < 10'd18);
+            right_bot = (dx >= 10'd23) && (dx < 10'd28) && (dy >= 10'd18) && (dy < 10'd31);
+            diag_left = (dx >= 10'd7) && (dx < 10'd12) && (dy >= 10'd5) && (dy < 10'd31);
+            diag_right = (dx >= 10'd16) && (dx < 10'd21) && (dy >= 10'd5) && (dy < 10'd31);
+
+            case (letter)
+                4'd0: letter_pixel = top_seg || mid_seg || bot_seg || left_top || right_bot; // S
+                4'd1: letter_pixel = top_seg || ((dx >= 10'd12) && (dx < 10'd17) && (dy < 10'd36)); // T
+                4'd2: letter_pixel = top_seg || mid_seg || left_top || left_bot || right_top || right_bot; // A
+                4'd3: letter_pixel = top_seg || mid_seg || left_top || right_top || right_bot || left_bot; // R
+                4'd4: letter_pixel = top_seg || bot_seg || left_top || left_bot || right_bot || mid_seg; // G
+                4'd5: letter_pixel = left_top || left_bot || right_top || right_bot || top_seg || diag_left || diag_right; // M
+                4'd6: letter_pixel = top_seg || mid_seg || bot_seg || left_top || left_bot; // E
+                4'd7: letter_pixel = top_seg || bot_seg || left_top || left_bot || right_top || right_bot; // O
+                4'd8: letter_pixel = left_top || right_top || ((dy >= 10'd18) && (dy < 10'd31) && (dx >= 10'd8) && (dx < 10'd20)) || bot_seg; // V
+                default: letter_pixel = 1'b0;
+            endcase
+        end
+    endfunction
+
+    function text_start_pixel;
+        input [9:0] x;
+        input [9:0] y;
+        reg [9:0] local_x;
+        reg [9:0] local_y;
+        begin
+            local_x = x - 10'd238;
+            local_y = y - 10'd210;
+            text_start_pixel = 1'b0;
+
+            if (y >= 10'd210 && y < 10'd246) begin
+                if (x >= 10'd238 && x < 10'd266)
+                    text_start_pixel = letter_pixel(4'd0, local_x, local_y);
+                else if (x >= 10'd272 && x < 10'd300)
+                    text_start_pixel = letter_pixel(4'd1, x - 10'd272, local_y);
+                else if (x >= 10'd306 && x < 10'd334)
+                    text_start_pixel = letter_pixel(4'd2, x - 10'd306, local_y);
+                else if (x >= 10'd340 && x < 10'd368)
+                    text_start_pixel = letter_pixel(4'd3, x - 10'd340, local_y);
+                else if (x >= 10'd374 && x < 10'd402)
+                    text_start_pixel = letter_pixel(4'd1, x - 10'd374, local_y);
+            end
+        end
+    endfunction
+
+    function text_game_over_pixel;
+        input [9:0] x;
+        input [9:0] y;
+        reg [9:0] local_y;
+        begin
+            text_game_over_pixel = 1'b0;
+
+            if (y >= 10'd178 && y < 10'd214) begin
+                local_y = y - 10'd178;
+                if (x >= 10'd255 && x < 10'd283)
+                    text_game_over_pixel = letter_pixel(4'd4, x - 10'd255, local_y);
+                else if (x >= 10'd289 && x < 10'd317)
+                    text_game_over_pixel = letter_pixel(4'd2, x - 10'd289, local_y);
+                else if (x >= 10'd323 && x < 10'd351)
+                    text_game_over_pixel = letter_pixel(4'd5, x - 10'd323, local_y);
+                else if (x >= 10'd357 && x < 10'd385)
+                    text_game_over_pixel = letter_pixel(4'd6, x - 10'd357, local_y);
+            end else if (y >= 10'd226 && y < 10'd262) begin
+                local_y = y - 10'd226;
+                if (x >= 10'd238 && x < 10'd266)
+                    text_game_over_pixel = letter_pixel(4'd7, x - 10'd238, local_y);
+                else if (x >= 10'd272 && x < 10'd300)
+                    text_game_over_pixel = letter_pixel(4'd8, x - 10'd272, local_y);
+                else if (x >= 10'd306 && x < 10'd334)
+                    text_game_over_pixel = letter_pixel(4'd6, x - 10'd306, local_y);
+                else if (x >= 10'd340 && x < 10'd368)
+                    text_game_over_pixel = letter_pixel(4'd3, x - 10'd340, local_y);
+            end
         end
     endfunction
 
@@ -246,29 +341,22 @@ module vga_renderer(
 
     assign in_score = in_score_tens || in_score_ones;
 
-    assign in_idle_marker =
-        (game_state == S_IDLE) &&
-        (pixel_x >= 10'd250) && (pixel_x < 10'd390) &&
-        (pixel_y >= 10'd210) && (pixel_y < 10'd270);
-
-    assign in_game_over_bar =
-        (game_state == S_GAME_OVER || dead) &&
-        (pixel_x >= 10'd180) && (pixel_x < 10'd460) &&
-        (pixel_y >= 10'd200) && (pixel_y < 10'd280);
+    assign in_start_text = (game_state == S_IDLE) && text_start_pixel(pixel_x, pixel_y);
+    assign in_game_text = (game_state == S_GAME_OVER || dead) && text_game_over_pixel(pixel_x, pixel_y);
 
     always @(*) begin
         if (!video_on) begin
             vga_r = 4'h0;
             vga_g = 4'h0;
             vga_b = 4'h0;
-        end else if (in_game_over_bar) begin
-            vga_r = 4'hD;
-            vga_g = 4'h1;
-            vga_b = 4'h1;
-        end else if (in_idle_marker) begin
+        end else if (in_start_text) begin
             vga_r = 4'hF;
             vga_g = 4'hD;
             vga_b = 4'h3;
+        end else if (in_game_text) begin
+            vga_r = 4'hF;
+            vga_g = 4'h2;
+            vga_b = 4'h2;
         end else if (in_score) begin
             vga_r = 4'hF;
             vga_g = 4'hF;
