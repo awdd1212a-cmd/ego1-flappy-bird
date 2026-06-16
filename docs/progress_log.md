@@ -119,6 +119,15 @@ VGA color test synthesis result:
 - XDC: constraints/ego1_vga_color_test.xdc
 - Vivado synthesis completed with 0 errors, 0 critical warnings, and 0 warnings
 
+VGA color test implementation result:
+
+- Top module: top_vga_color_test
+- Vivado opt/place/route completed successfully
+- Bitstream generation completed successfully
+- Generated bitstream during local build:
+  - C:/ego1_vga_color_build2/bitstream/top_vga_color_test.bit
+- Automatic Vivado Hardware Manager probe timed out, so board programming still needs to be done from Vivado GUI or retried after confirming the EGO1 USB/JTAG connection
+
 ## Important Notes
 
 There are currently three top versions:
