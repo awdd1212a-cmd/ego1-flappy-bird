@@ -27,7 +27,7 @@ module tb_top;
     // Instantiate top
     // ============================================================
 
-    top uut (
+    top_debug uut (
         .clk(clk),
         .rst(rst),
 

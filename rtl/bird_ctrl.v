@@ -42,21 +42,21 @@ module bird_ctrl(
             case (game_state)
 
                 S_IDLE: begin
-                    // 待機時固定在初始位置
+                    // Hold the bird at the initial position before the game starts.
                     bird_y <= BIRD_Y_INIT;
                 end
 
                 S_PLAY: begin
                     if (game_tick) begin
                         if (flap_pulse) begin
-                            // 往上跳，避免 unsigned 扣到爆掉
+                            // Move upward and clamp at the top of the screen.
                             if (bird_y > FLAP_STEP)
                                 bird_y <= bird_y - FLAP_STEP;
                             else
                                 bird_y <= TOP_LIMIT;
                         end
                         else begin
-                            // 自然下落，避免掉到地板以下
+                            // Fall downward and clamp at the ground.
                             if (bird_y < BIRD_Y_MAX - FALL_STEP)
                                 bird_y <= bird_y + FALL_STEP;
                             else
@@ -66,7 +66,7 @@ module bird_ctrl(
                 end
 
                 S_GAME_OVER: begin
-                    // 死掉後先保持位置不動
+                    // Freeze the bird after game over.
                     bird_y <= bird_y;
                 end
 

@@ -63,7 +63,7 @@ module score_ctrl(
                     pipe1_counted <= 1'b1;
                 end
 
-                // 當 pipe 回到右側，解除 counted
+                // Clear the counted flag after the pipe is recycled.
                 if (pipe1_x > 10'd600) begin
                     pipe1_counted <= 1'b0;
                 end

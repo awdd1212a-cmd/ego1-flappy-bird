@@ -24,6 +24,7 @@ module top_debug(
 
     wire start_pulse;
     wire flap_pulse;
+    reg  flap_pending;
 
     wire game_tick;
 
@@ -55,6 +56,18 @@ module top_debug(
     end
 
     assign game_tick = (tick_cnt == GAME_TICK_MAX);
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            flap_pending <= 1'b0;
+        end else if (game_state != 2'd1) begin
+            flap_pending <= 1'b0;
+        end else if (flap_pulse) begin
+            flap_pending <= 1'b1;
+        end else if (game_tick) begin
+            flap_pending <= 1'b0;
+        end
+    end
 
     // ============================================================
     // Button control
@@ -94,7 +107,7 @@ module top_debug(
         .rst(rst),
 
         .game_tick(game_tick),
-        .flap_pulse(flap_pulse),
+        .flap_pulse(flap_pending),
         .game_state(game_state),
 
         .bird_x(bird_x),

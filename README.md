@@ -14,7 +14,7 @@
 - 按鍵可以控制遊戲開始與鳥的跳躍
 - 鳥會受到簡化重力影響並上下移動
 - 管子會由右往左移動，並保留可通過的 gap
-- 撞到地板、邊界或管子時進入 GAME_OVER
+- 撞到地板或管子時進入 GAME_OVER
 - 遊戲畫面能看出 bird、pipes、ground、IDLE / PLAY / GAME_OVER 狀態
 - 分數由 game logic 計算，至少可透過 debug 訊號、LED 或後續 VGA 顯示確認
 
@@ -83,7 +83,7 @@ rtl/pipe_ctrl.v
 負責控制管子的移動，以及每個 pipe 的 gap 位置。
 
 rtl/collision.v  
-負責判斷鳥是否撞到地板、邊界或管子。
+負責判斷鳥是否撞到地板或管子。
 
 rtl/score_ctrl.v  
 負責分數計算。
