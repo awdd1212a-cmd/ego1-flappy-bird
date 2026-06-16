@@ -235,6 +235,24 @@ Experimental J5 keypad bitstream:
   - bitstream generated at C:/ego1_top_vga_build/bitstream/top_vga.bit
 - This is an experimental pin guess. If LD0/LD1/LD2 do not react to keys 1/5/D, the J5 mapping or row/column direction must be revised.
 
+Experimental J5 result and fallback:
+
+- Board test result:
+  - keypad did not trigger any LED response
+  - the guessed J5 mapping is incorrect
+- Current recovery version:
+  - top_vga has been switched back to the known-good EGO1 board buttons
+  - S4 = reset
+  - S0 = start
+  - S2 = flap
+  - START and GAME / OVER text rendering remain enabled
+  - score rule remains every 3 passed pipes = +5 points
+- Vivado build completed again with:
+  - 0 errors
+  - 0 critical warnings
+  - bitstream regenerated at C:/ego1_top_vga_build/bitstream/top_vga.bit
+- Keypad support remains parked until the real J5 PACKAGE_PIN mapping is available.
+
 ## Important Notes
 
 There are currently three top versions:

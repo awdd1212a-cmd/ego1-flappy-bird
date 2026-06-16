@@ -8,39 +8,18 @@ set_property PACKAGE_PIN P17 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
 create_clock -period 10.000 -name sys_clk [get_ports clk]
 
-# 4x4 Keypad - experimental J5 guess
-# Current RTL mapping:
-#   1 = start
-#   5 = flap
-#   D = reset
-#
-# This guess uses the clearly visible EGO1 silk-screen labels near J5:
-#   rows: CA0(B4), CB0(A4), CC0(A3), CD0(B1)
-#   cols: DK1(G2), DK2(C2), DK3(C1), DK4(H1)
-# If the keypad has no response, J5 is probably mapped differently or
-# row/column direction is swapped.
+# Buttons
+# S4 Reset
+set_property PACKAGE_PIN U4 [get_ports rst]
+set_property IOSTANDARD LVCMOS33 [get_ports rst]
 
-set_property PACKAGE_PIN B4 [get_ports {keypad_row[0]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[0]}]
-set_property PULLUP true [get_ports {keypad_row[0]}]
-set_property PACKAGE_PIN A4 [get_ports {keypad_row[1]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[1]}]
-set_property PULLUP true [get_ports {keypad_row[1]}]
-set_property PACKAGE_PIN A3 [get_ports {keypad_row[2]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[2]}]
-set_property PULLUP true [get_ports {keypad_row[2]}]
-set_property PACKAGE_PIN B1 [get_ports {keypad_row[3]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_row[3]}]
-set_property PULLUP true [get_ports {keypad_row[3]}]
+# S0 Start
+set_property PACKAGE_PIN R11 [get_ports btnC]
+set_property IOSTANDARD LVCMOS33 [get_ports btnC]
 
-set_property PACKAGE_PIN G2 [get_ports {keypad_col[0]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[0]}]
-set_property PACKAGE_PIN C2 [get_ports {keypad_col[1]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[1]}]
-set_property PACKAGE_PIN C1 [get_ports {keypad_col[2]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[2]}]
-set_property PACKAGE_PIN H1 [get_ports {keypad_col[3]}]
-set_property IOSTANDARD LVCMOS33 [get_ports {keypad_col[3]}]
+# S2 Flap
+set_property PACKAGE_PIN R15 [get_ports btnU]
+set_property IOSTANDARD LVCMOS33 [get_ports btnU]
 
 # VGA Red[3:0]
 set_property PACKAGE_PIN F5 [get_ports {vga_r[0]}]
