@@ -18,7 +18,8 @@ module score_ctrl(
 
     localparam [10:0] PIPE_W = 11'd40;
     localparam [10:0] SCREEN_W = 11'd640;
-    localparam [7:0]  SCORE_STEP = 8'd5;
+    localparam [7:0]  SCORE_STEP_NORMAL = 8'd1;
+    localparam [7:0]  SCORE_STEP_BONUS = 8'd5;
 
     reg [9:0] pipe1_x_prev;
     reg [9:0] pipe2_x_prev;
@@ -81,9 +82,10 @@ module score_ctrl(
         end else if (game_state == S_PLAY && game_tick) begin
             if (any_pipe_passed) begin
                 if (passed_pipe_count == 2'd2) begin
-                    score <= score + SCORE_STEP;
+                    score <= score + SCORE_STEP_BONUS;
                     passed_pipe_count <= 2'd0;
                 end else begin
+                    score <= score + SCORE_STEP_NORMAL;
                     passed_pipe_count <= passed_pipe_count + 2'd1;
                 end
             end

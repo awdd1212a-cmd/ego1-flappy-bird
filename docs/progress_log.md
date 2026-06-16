@@ -8,6 +8,15 @@ The current game logic has been verified through simulation and EGO1 LED board t
 
 VGA timing first-pass implementation is complete. The color-bar VGA test top has passed simulation, synthesis, implementation, bitstream generation, and board display testing through the VGA to HDMI capture path.
 
+Latest score rule update:
+
+- Each passed pipe now adds score.
+- Pipe 1 adds 1 point.
+- Pipe 2 adds 1 point.
+- Pipe 3 adds 5 points.
+- The same 1, 1, 5 pattern repeats for later pipes.
+- Pipe pass detection still uses previous/current pipe right-edge positions to avoid repeated scoring on the same pipe.
+
 ## Completed Modules
 
 - button_ctrl.v
