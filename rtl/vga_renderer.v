@@ -31,6 +31,11 @@ module vga_renderer(
     localparam [9:0] PIPE_W = 10'd40;
     localparam [9:0] GAP_H  = 10'd180;
     localparam [9:0] GROUND_Y = 10'd440;
+    localparam [9:0] SCORE_X0 = 10'd20;
+    localparam [9:0] SCORE_Y0 = 10'd18;
+    localparam [9:0] DIGIT_W = 10'd20;
+    localparam [9:0] DIGIT_H = 10'd28;
+    localparam [9:0] DIGIT_GAP = 10'd6;
 
     wire [9:0] bird_y_10;
     wire [9:0] pipe1_gap_y_10;
@@ -53,9 +58,62 @@ module vga_renderer(
     wire in_pipe2;
     wire in_pipe3;
     wire in_pipe;
+    wire in_pipe_highlight;
+    wire in_cloud;
+    wire in_ground_line;
     wire in_game_over_bar;
     wire in_idle_marker;
-    wire score_nonzero;
+    wire in_score_tens;
+    wire in_score_ones;
+    wire in_score;
+    reg [3:0] score_tens;
+    reg [3:0] score_ones;
+
+    function digit_pixel;
+        input [3:0] digit;
+        input [9:0] dx;
+        input [9:0] dy;
+        reg [6:0] seg;
+        reg a;
+        reg b;
+        reg c;
+        reg d;
+        reg e;
+        reg f;
+        reg g;
+        begin
+            case (digit)
+                4'd0: seg = 7'b1111110;
+                4'd1: seg = 7'b0110000;
+                4'd2: seg = 7'b1101101;
+                4'd3: seg = 7'b1111001;
+                4'd4: seg = 7'b0110011;
+                4'd5: seg = 7'b1011011;
+                4'd6: seg = 7'b1011111;
+                4'd7: seg = 7'b1110000;
+                4'd8: seg = 7'b1111111;
+                4'd9: seg = 7'b1111011;
+                default: seg = 7'b0000001;
+            endcase
+
+            a = (dy < 10'd4) && (dx >= 10'd4) && (dx < 10'd16);
+            b = (dx >= 10'd16) && (dx < 10'd20) && (dy >= 10'd4) && (dy < 10'd14);
+            c = (dx >= 10'd16) && (dx < 10'd20) && (dy >= 10'd14) && (dy < 10'd24);
+            d = (dy >= 10'd24) && (dy < 10'd28) && (dx >= 10'd4) && (dx < 10'd16);
+            e = (dx < 10'd4) && (dy >= 10'd14) && (dy < 10'd24);
+            f = (dx < 10'd4) && (dy >= 10'd4) && (dy < 10'd14);
+            g = (dy >= 10'd12) && (dy < 10'd16) && (dx >= 10'd4) && (dx < 10'd16);
+
+            digit_pixel =
+                (seg[6] && a) ||
+                (seg[5] && b) ||
+                (seg[4] && c) ||
+                (seg[3] && d) ||
+                (seg[2] && e) ||
+                (seg[1] && f) ||
+                (seg[0] && g);
+        end
+    endfunction
 
     assign in_ground = (pixel_y >= GROUND_Y);
 
@@ -115,7 +173,78 @@ module vga_renderer(
          (pixel_y >= pipe3_gap_y_10 + GAP_H));
 
     assign in_pipe = in_pipe1 || in_pipe2 || in_pipe3;
-    assign score_nonzero = (score != 8'd0);
+
+    assign in_pipe_highlight =
+        in_pipe &&
+        (((pixel_x >= pipe1_x + 10'd3) && (pixel_x < pipe1_x + 10'd7)) ||
+         ((pixel_x >= pipe2_x + 10'd3) && (pixel_x < pipe2_x + 10'd7)) ||
+         ((pixel_x >= pipe3_x + 10'd3) && (pixel_x < pipe3_x + 10'd7)));
+
+    assign in_cloud =
+        ((pixel_x >= 10'd70) && (pixel_x < 10'd150) &&
+         pixel_y >= 10'd55 && pixel_y < 10'd78) ||
+        ((pixel_x >= 10'd420) && (pixel_x < 10'd520) &&
+         pixel_y >= 10'd90 && pixel_y < 10'd116);
+
+    assign in_ground_line =
+        in_ground &&
+        ((pixel_y == 10'd440) ||
+         ((pixel_y >= 10'd458) && (pixel_y < 10'd462)) ||
+         ((pixel_x[5:0] >= 6'd0) && (pixel_x[5:0] < 6'd5) &&
+          (pixel_y >= 10'd446) && (pixel_y < 10'd480)));
+
+    always @(*) begin
+        if (score >= 8'd99) begin
+            score_tens = 4'd9;
+            score_ones = 4'd9;
+        end else if (score >= 8'd90) begin
+            score_tens = 4'd9;
+            score_ones = score - 8'd90;
+        end else if (score >= 8'd80) begin
+            score_tens = 4'd8;
+            score_ones = score - 8'd80;
+        end else if (score >= 8'd70) begin
+            score_tens = 4'd7;
+            score_ones = score - 8'd70;
+        end else if (score >= 8'd60) begin
+            score_tens = 4'd6;
+            score_ones = score - 8'd60;
+        end else if (score >= 8'd50) begin
+            score_tens = 4'd5;
+            score_ones = score - 8'd50;
+        end else if (score >= 8'd40) begin
+            score_tens = 4'd4;
+            score_ones = score - 8'd40;
+        end else if (score >= 8'd30) begin
+            score_tens = 4'd3;
+            score_ones = score - 8'd30;
+        end else if (score >= 8'd20) begin
+            score_tens = 4'd2;
+            score_ones = score - 8'd20;
+        end else if (score >= 8'd10) begin
+            score_tens = 4'd1;
+            score_ones = score - 8'd10;
+        end else begin
+            score_tens = 4'd0;
+            score_ones = score[3:0];
+        end
+    end
+
+    assign in_score_tens =
+        (pixel_x >= SCORE_X0) &&
+        (pixel_x < SCORE_X0 + DIGIT_W) &&
+        (pixel_y >= SCORE_Y0) &&
+        (pixel_y < SCORE_Y0 + DIGIT_H) &&
+        digit_pixel(score_tens, pixel_x - SCORE_X0, pixel_y - SCORE_Y0);
+
+    assign in_score_ones =
+        (pixel_x >= SCORE_X0 + DIGIT_W + DIGIT_GAP) &&
+        (pixel_x < SCORE_X0 + DIGIT_W + DIGIT_GAP + DIGIT_W) &&
+        (pixel_y >= SCORE_Y0) &&
+        (pixel_y < SCORE_Y0 + DIGIT_H) &&
+        digit_pixel(score_ones, pixel_x - SCORE_X0 - DIGIT_W - DIGIT_GAP, pixel_y - SCORE_Y0);
+
+    assign in_score = in_score_tens || in_score_ones;
 
     assign in_idle_marker =
         (game_state == S_IDLE) &&
@@ -140,6 +269,10 @@ module vga_renderer(
             vga_r = 4'hF;
             vga_g = 4'hD;
             vga_b = 4'h3;
+        end else if (in_score) begin
+            vga_r = 4'hF;
+            vga_g = 4'hF;
+            vga_b = 4'hF;
         end else if (in_bird_pupil) begin
             vga_r = 4'h0;
             vga_g = 4'h0;
@@ -164,15 +297,23 @@ module vga_renderer(
             vga_r = 4'hF;
             vga_g = 4'hD;
             vga_b = 4'h2;
+        end else if (in_pipe_highlight) begin
+            vga_r = 4'h6;
+            vga_g = 4'hF;
+            vga_b = 4'h6;
         end else if (in_pipe) begin
             vga_r = 4'h1;
             vga_g = 4'hB;
             vga_b = 4'h3;
+        end else if (in_ground_line) begin
+            vga_r = 4'h9;
+            vga_g = 4'h5;
+            vga_b = 4'h2;
         end else if (in_ground) begin
             vga_r = 4'h6;
             vga_g = 4'h3;
             vga_b = 4'h1;
-        end else if (score_nonzero && pixel_y < 10'd12) begin
+        end else if (in_cloud) begin
             vga_r = 4'hF;
             vga_g = 4'hF;
             vga_b = 4'hF;

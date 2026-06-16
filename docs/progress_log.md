@@ -184,6 +184,22 @@ Latest top_vga build result:
 - Board test status:
   - waiting for the latest tuned bitstream to be programmed and tested on EGO1
 
+Latest bonus feature update:
+
+- VGA score display added:
+  - two decimal digits at the top-left corner
+  - score is clamped to 99 for display
+- Visual polish added:
+  - simple white clouds in the sky
+  - ground texture lines
+  - brighter pipe highlight strips
+- Vivado build completed again after the bonus renderer update:
+  - 0 errors
+  - 0 critical warnings
+  - bitstream regenerated at C:/ego1_top_vga_build/bitstream/top_vga.bit
+- Board test status:
+  - waiting for EGO1 testing of the bonus display version
+
 ## Important Notes
 
 There are currently three top versions:
@@ -267,6 +283,7 @@ Recommended next test steps:
 
 - Program C:/ego1_top_vga_build/bitstream/top_vga.bit through Vivado Hardware Manager
 - Confirm the OBS display shows the larger bird with beak, eye, pupil, and wing
+- Confirm the score digits, clouds, ground texture, and pipe highlights are visible
 - Confirm the pipe gap is easier to pass through
 - Confirm flap control feels playable rather than instantly dying
 - If needed, tune BIRD_SIZE, GAP_H, PIPE_SPEED, FLAP_STEP, and FALL_STEP again based on the actual board result
