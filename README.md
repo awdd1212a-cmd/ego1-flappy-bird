@@ -35,7 +35,7 @@
 - PLAY
 - GAME_OVER
 
-這代表目前遊戲核心邏輯已經可以正常運作，下一階段重點是 VGA 顯示與 final top 整合。
+這代表目前遊戲核心邏輯已經可以正常運作。VGA timing 第一版也已完成，並通過 Vivado behavioral simulation；彩條測試 top 已通過 Vivado synthesis。下一階段重點是實際上板確認 VGA 畫面，以及開始整合 renderer。
 
 ## 系統架構
 
@@ -94,10 +94,11 @@ rtl/top_debug.v
 rtl/top_board_led_test.v  
 這是 EGO1 LED 上板測試用的 top，已經實際燒錄到板子測試通過。
 
-後續預計新增：
-
 rtl/vga_sync.v  
 產生 640x480 @ 60Hz VGA timing，包括 pixel 座標、hsync、vsync 和 video_on。
+
+rtl/top_vga_color_test.v
+VGA 上板前的彩條測試 top，用來確認 EGO1 VGA 輸出、VGA to HDMI 轉換器與擷取卡能正常顯示畫面。
 
 rtl/vga_renderer.v  
 根據目前 pixel 座標與 game logic 訊號決定 RGB 輸出，畫出 bird、pipes、ground 和遊戲狀態。
@@ -304,13 +305,18 @@ VGA 腳位參考請看：
 
 constraints/ego1_vga_reference.xdc
 
+constraints/ego1_vga_color_test.xdc
+
+這份是 VGA 彩條測試 top 的正式 XDC，可搭配 top_vga_color_test.v 先做上板畫面測試。
+
 ## 兩週內完成策略
 
 為了確保專題可以完整收斂，優先完成必要功能，再做加分項。
 
 必要功能：
 
-- vga_sync.v 產生穩定 VGA timing
+- vga_sync.v 產生穩定 VGA timing（已完成 simulation）
+- top_vga_color_test.v 產生 VGA 彩條測試畫面（已通過 synthesis）
 - vga_renderer.v 畫出天空、地板、鳥、管子
 - top_vga.v 整合現有 game logic 與 VGA 顯示
 - IDLE / PLAY / GAME_OVER 都能在畫面上被分辨
@@ -325,11 +331,11 @@ constraints/ego1_vga_reference.xdc
 
 ## 下一步
 
-下一階段主要是 VGA renderer 整合。
+下一階段主要是 VGA 彩條上板測試，確認擷取卡能收到畫面後，再開始 VGA renderer 整合。
 
 建議實作順序：
 
-1. 完成 vga_sync.v，先確認螢幕可以穩定顯示純色背景
+1. 用 top_vga_color_test.v 和 ego1_vga_color_test.xdc 上板，確認擷取卡有穩定彩條畫面
 2. 完成 vga_renderer.v，畫出 sky、ground、bird、pipes
 3. 建立 top_vga.v，接上現有 game logic
 4. 上板測試 start、flap、collision、GAME_OVER

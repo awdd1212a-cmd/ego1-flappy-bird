@@ -107,6 +107,24 @@ Recommended VGA output names:
 
 These names match constraints/ego1_vga_reference.xdc.
 
+## VGA Sync Signals
+
+Provided by rtl/vga_sync.v:
+
+- pixel_x[9:0]
+- pixel_y[9:0]
+- video_on
+- pixel_tick
+- vga_hsync
+- vga_vsync
+
+Renderer usage:
+
+- pixel_x and pixel_y identify the current pixel location
+- video_on is 1 only inside the visible 640x480 area
+- RGB output should be black when video_on is 0
+- pixel_tick is a 25 MHz enable derived from the 100 MHz EGO1 clock
+
 ## LED Board Test Result
 
 Game logic has passed EGO1 LED board test.
