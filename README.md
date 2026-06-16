@@ -1,8 +1,22 @@
 # EGO1 Flappy Bird FPGA Project
 
-這是我們 FPGA 小專題的 GitHub repo，主題是使用 EGO1 FPGA 板實作簡化版 Flappy Bird。
+這是 FPGA 小專題的 GitHub repo，主題是使用 EGO1 FPGA 板實作一款簡化版 Flappy Bird。
 
-目前主要目標是先完成遊戲邏輯，再和 VGA 顯示模組整合。
+本專題的最終目標是完成一款可以在 EGO1 FPGA 上實際操作，並透過 VGA 輸出畫面的簡化版 Flappy Bird 遊戲。遊戲會包含按鍵輸入、狀態控制、鳥的跳躍、管子移動、碰撞判斷、分數計算，以及即時 VGA 畫面顯示。
+
+專題定位不是製作複雜美術或商業等級遊戲，而是完成一個架構清楚、可上板展示、可說明硬體設計流程的 FPGA 遊戲作品。
+
+## 最終完成目標
+
+完成後的遊戲至少需要具備以下功能：
+
+- VGA 輸出穩定顯示遊戲畫面
+- 按鍵可以控制遊戲開始與鳥的跳躍
+- 鳥會受到簡化重力影響並上下移動
+- 管子會由右往左移動，並保留可通過的 gap
+- 撞到地板、邊界或管子時進入 GAME_OVER
+- 遊戲畫面能看出 bird、pipes、ground、IDLE / PLAY / GAME_OVER 狀態
+- 分數由 game logic 計算，至少可透過 debug 訊號、LED 或後續 VGA 顯示確認
 
 ## 目前進度
 
@@ -20,6 +34,25 @@
 - IDLE
 - PLAY
 - GAME_OVER
+
+這代表目前遊戲核心邏輯已經可以正常運作，下一階段重點是 VGA 顯示與 final top 整合。
+
+## 系統架構
+
+整體專案可以分成三個主要部分：
+
+1. Input control
+   - 將 EGO1 按鍵輸入轉成 one-cycle pulse
+   - 提供 start 與 flap 控制訊號
+
+2. Game logic
+   - 控制遊戲狀態、鳥的位置、管子位置、碰撞與分數
+   - 目前已完成第一階段並通過 LED 上板測試
+
+3. VGA display
+   - 產生 VGA timing
+   - 根據 game logic 的座標與狀態畫出天空、地板、鳥、管子與遊戲狀態
+   - 這是下一階段主要整合目標
 
 ## 資料夾說明
 
@@ -61,6 +94,46 @@ rtl/top_debug.v
 rtl/top_board_led_test.v  
 這是 EGO1 LED 上板測試用的 top，已經實際燒錄到板子測試通過。
 
+後續預計新增：
+
+rtl/vga_sync.v  
+產生 640x480 @ 60Hz VGA timing，包括 pixel 座標、hsync、vsync 和 video_on。
+
+rtl/vga_renderer.v  
+根據目前 pixel 座標與 game logic 訊號決定 RGB 輸出，畫出 bird、pipes、ground 和遊戲狀態。
+
+rtl/top_vga.v  
+最終 VGA 版本 top module，整合 button control、game logic、VGA sync 和 renderer。
+
+## VGA 顯示規劃
+
+VGA 目標採用簡潔但完整的矩形風格，避免過度複雜的 sprite 或圖片 ROM，確保可以在專題時程內完成並穩定上板。
+
+預計畫面元素：
+
+- 背景：淺藍色天空
+- 地板：底部固定高度的 ground
+- 鳥：黃色矩形或簡單方塊，可加黑色邊框增加辨識度
+- 管子：綠色上下矩形，中間保留 gap
+- IDLE：顯示等待開始狀態
+- PLAY：正常遊戲畫面
+- GAME_OVER：顯示結束狀態，可用紅色提示或畫面變暗表示
+
+renderer 核心邏輯會使用座標範圍判斷，例如：
+
+```verilog
+if (pixel is inside bird)
+    draw yellow;
+else if (pixel is inside pipe)
+    draw green;
+else if (pixel is inside ground)
+    draw ground color;
+else
+    draw sky color;
+```
+
+這種方式可綜合、容易除錯，也適合 FPGA 小專題展示。
+
 ## Simulation
 
 simulation testbench 放在：
@@ -74,6 +147,13 @@ sim/tb_top.v
 - bird_y 會變化
 - pipe_x 會移動
 - collision 發生後進入 GAME_OVER
+
+後續 VGA 整合後，建議新增或擴充測試：
+
+- VGA counter 是否產生正確 h_count / v_count
+- video_on 是否只在可視區域內為 1
+- renderer 在指定座標是否輸出正確顏色
+- top_vga 是否能接上現有 game logic 訊號
 
 ## Constraints
 
@@ -165,6 +245,25 @@ LED 對應：
 
 這版可以搭配 constraints/ego1_led_test.xdc 使用。
 
+### top_vga.v
+
+用途：
+
+- 最終 VGA 遊戲展示版本
+- 整合 game logic 與 VGA 顯示
+
+這版預計會包含：
+
+- clk
+- rst
+- start button
+- flap button
+- vga_r[3:0]
+- vga_g[3:0]
+- vga_b[3:0]
+- vga_hsync
+- vga_vsync
+
 ## GAME_TICK_MAX 設定
 
 simulation 用：
@@ -205,16 +304,35 @@ VGA 腳位參考請看：
 
 constraints/ego1_vga_reference.xdc
 
+## 兩週內完成策略
+
+為了確保專題可以完整收斂，優先完成必要功能，再做加分項。
+
+必要功能：
+
+- vga_sync.v 產生穩定 VGA timing
+- vga_renderer.v 畫出天空、地板、鳥、管子
+- top_vga.v 整合現有 game logic 與 VGA 顯示
+- IDLE / PLAY / GAME_OVER 都能在畫面上被分辨
+- 實際上板測試可操作、可顯示、可 Game Over
+
+加分功能：
+
+- 鳥和水管加邊框，讓畫面更清楚
+- GAME_OVER 畫面加簡單提示
+- 分數顯示到 VGA 畫面
+- 增加簡單背景線條或地板紋理
+
 ## 下一步
 
 下一階段主要是 VGA renderer 整合。
 
-顯示端需要根據 game logic 給出的座標畫出：
+建議實作順序：
 
-- bird
-- pipes
-- ground
-- start / game over 狀態
-- optional score display
+1. 完成 vga_sync.v，先確認螢幕可以穩定顯示純色背景
+2. 完成 vga_renderer.v，畫出 sky、ground、bird、pipes
+3. 建立 top_vga.v，接上現有 game logic
+4. 上板測試 start、flap、collision、GAME_OVER
+5. 補上 README、測試紀錄與展示結果
 
 目前 game logic 端已經完成第一階段，可以開始和 VGA 顯示端對接。
