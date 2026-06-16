@@ -193,9 +193,9 @@ module top_vga(
         .vga_b(vga_b)
     );
 
-    assign led[0] = game_state[0];
-    assign led[1] = game_state[1];
-    assign led[2] = dead;
-    assign led[3] = key_flap;
+    assign led[0] = key_start;
+    assign led[1] = key_flap;
+    assign led[2] = key_reset;
+    assign led[3] = dead;
 
 endmodule

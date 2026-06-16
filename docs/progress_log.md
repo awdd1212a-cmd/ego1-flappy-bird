@@ -219,6 +219,22 @@ Latest requested control/display update:
   - Vivado xvlog syntax check passed for the updated RTL
   - full bitstream generation is intentionally blocked until keypad PACKAGE_PIN values are known
 
+Experimental J5 keypad bitstream:
+
+- A guessed J5 mapping was added based on the visible EGO1 silk-screen labels near the connector:
+  - keypad_row[0..3] = CA0(B4), CB0(A4), CC0(A3), CD0(B1)
+  - keypad_col[0..3] = DK1(G2), DK2(C2), DK3(C1), DK4(H1)
+- LED debug was changed for keypad testing:
+  - LD0 = key 1 / start
+  - LD1 = key 5 / flap
+  - LD2 = key D / reset
+  - LD3 = dead
+- Vivado build completed with:
+  - 0 errors
+  - 0 critical warnings
+  - bitstream generated at C:/ego1_top_vga_build/bitstream/top_vga.bit
+- This is an experimental pin guess. If LD0/LD1/LD2 do not react to keys 1/5/D, the J5 mapping or row/column direction must be revised.
+
 ## Important Notes
 
 There are currently three top versions:
