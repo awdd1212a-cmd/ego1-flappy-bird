@@ -22,6 +22,13 @@ Latest VGA text update:
 - The START and GAME OVER text now uses a distinct R glyph.
 - R keeps the upper bowl and adds a lower diagonal leg, so it no longer looks like A.
 
+Latest keypad debug update:
+
+- Added a standalone J5 keypad probe top.
+- The probe scans J5-1 through J5-32 one pin at a time.
+- Pressed keys are reported as two connected J5 pin numbers on the 16 board LEDs.
+- This probe is only for mapping the external keypad board and does not change the playable top_vga design.
+
 ## Completed Modules
 
 - button_ctrl.v
