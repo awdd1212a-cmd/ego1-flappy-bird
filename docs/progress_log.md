@@ -28,6 +28,7 @@ Latest keypad debug update:
 - The probe uses SW1/SW0 to scan one 8-pin J5 bank at a time.
 - Pressed keys are reported as two connected J5 pin numbers on the 16 board LEDs.
 - This probe is only for mapping the external keypad board and does not change the playable top_vga design.
+- Added a passive J5 raw monitor that keeps all J5 pins as inputs and checks whether keypad presses directly change any J5 level.
 
 ## Completed Modules
 
