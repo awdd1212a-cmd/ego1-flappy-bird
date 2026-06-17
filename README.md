@@ -1,356 +1,77 @@
 # EGO1 Flappy Bird FPGA Project
 
-這是 FPGA 小專題的 GitHub repo，主題是使用 EGO1 FPGA 板實作一款簡化版 Flappy Bird。
+這是以 EGO1 FPGA 開發板實作的 VGA 版 Flappy Bird 小遊戲。最終展示版本使用板上按鍵操作，透過 VGA 輸出到螢幕或 VGA to HDMI 擷取設備。
 
-本專題的最終目標是完成一款可以在 EGO1 FPGA 上實際操作，並透過 VGA 輸出畫面的簡化版 Flappy Bird 遊戲。遊戲會包含按鍵輸入、狀態控制、鳥的跳躍、管子移動、碰撞判斷、分數計算，以及即時 VGA 畫面顯示。
+## 最終功能
 
-專題定位不是製作複雜美術或商業等級遊戲，而是完成一個架構清楚、可上板展示、可說明硬體設計流程的 FPGA 遊戲作品。
+- 640x480 VGA 顯示
+- START / GAME OVER 畫面文字
+- pixel-art 小鳥、管子、天空、雲、地板紋理
+- 左上角兩位數分數
+- 碰撞判斷：管子、地板、畫面上緣
+- 分數規則：每通過一根管子加分，第 1、2 根各 +1，第 3 根 +5，之後重複 `+1, +1, +5`
 
-## 最終完成目標
+## 操作方式
 
-完成後的遊戲至少需要具備以下功能：
+| 功能 | EGO1 按鍵 |
+| --- | --- |
+| Reset | S4 |
+| Start | S0 |
+| Flap | S2 |
 
-- VGA 輸出穩定顯示遊戲畫面
-- 4x4 keypad 可以控制遊戲開始、鳥的跳躍與 reset
-- 鳥會受到簡化重力影響並上下移動
-- 管子會由右往左移動，並保留可通過的 gap
-- 撞到地板或管子時進入 GAME_OVER
-- 遊戲畫面能看出 bird、pipes、ground、IDLE / PLAY / GAME_OVER 狀態
-- 分數由 game logic 計算，至少可透過 debug 訊號、LED 或後續 VGA 顯示確認
+外接 NFU FPGA V2.0 keypad 擴充板因缺少該擴充板的 keypad 腳位表 / schematic / 範例 XDC，最終版不使用 keypad，避免 demo 不穩定。
 
-## 目前進度
+## 主要檔案
 
-目前 game logic 第一階段已完成，並且已經通過以下測試：
-
-- Behavioral Simulation 已通過
-- Synthesis 已通過
-- Implementation 已通過
-- Bitstream 已成功產生
-- 已成功燒錄到 EGO1 FPGA 板
-- LED board test 已通過
-
-目前已確認的遊戲流程：
-
-- IDLE
-- PLAY
-- GAME_OVER
-
-這代表目前遊戲核心邏輯已經可以正常運作。VGA timing 第一版也已完成，並通過 Vivado behavioral simulation；彩條測試 top 已完成 bitstream 產生並成功上板顯示。目前已新增 VGA renderer 與最終 top_vga，top_vga bitstream 已成功產生並上板顯示出遊戲畫面。最新一版已把鳥改成簡單 pixel-art 造型，並降低遊戲難度，下一步是將新版 bitstream 燒到 EGO1 上確認實際手感。
-
-目前已知需要改善：
-
-- 新版鳥已加入身體、嘴巴、眼睛、瞳孔、翅膀，仍可依實際畫面再調顏色與比例
-- 遊戲難度已先調成展示友善版本，仍需上板實測是否太簡單或太難
-- IDLE / GAME_OVER 的畫面提示仍偏簡單，後續可再加強辨識度
-
-## 系統架構
-
-整體專案可以分成三個主要部分：
-
-1. Input control
-   - 掃描外接 4x4 keypad
-   - 提供 start、flap 與 reset 控制訊號
-
-2. Game logic
-   - 控制遊戲狀態、鳥的位置、管子位置、碰撞與分數
-   - 目前已完成第一階段並通過 LED 上板測試
-
-3. VGA display
-   - 產生 VGA timing
-   - 根據 game logic 的座標與狀態畫出天空、地板、鳥、管子與遊戲狀態
-   - 這是下一階段主要整合目標
-
-## 資料夾說明
-
-rtl/  
-放 Verilog 設計模組，也就是主要會被 Vivado 合成的程式。
-
-sim/  
-放 simulation testbench，只用來模擬，不會燒進 FPGA。
-
-constraints/  
-放 EGO1 的 XDC 腳位約束檔。
-
-docs/  
-放訊號規格、進度紀錄，以及後續整合用的說明文件。
-
-## RTL 模組說明
-
-rtl/button_ctrl.v  
-負責把按鍵輸入轉成 one-cycle pulse，例如 start_pulse 和 flap_pulse。
-
-rtl/keypad_ctrl.v
-負責掃描 4x4 keypad，目前鍵位規劃為 1 = start、5 = flap、D = reset。
-
-rtl/game_fsm.v  
-負責控制遊戲狀態，目前有 IDLE、PLAY、GAME_OVER。
-
-rtl/bird_ctrl.v  
-負責控制鳥的位置，以及按下 flap 之後的跳躍行為。
-
-rtl/pipe_ctrl.v  
-負責控制管子的移動，以及每個 pipe 的 gap 位置。
-
-rtl/collision.v  
-負責判斷鳥是否撞到地板或管子。
-
-rtl/score_ctrl.v  
-負責分數計算。
-
-rtl/top_debug.v  
-這是 debug / integration 用的 top，適合 simulation、觀察訊號，以及後續和 VGA renderer 整合。
-
-rtl/top_board_led_test.v  
-這是 EGO1 LED 上板測試用的 top，已經實際燒錄到板子測試通過。
-
-rtl/vga_sync.v  
-產生 640x480 @ 60Hz VGA timing，包括 pixel 座標、hsync、vsync 和 video_on。
-
-rtl/top_vga_color_test.v
-VGA 上板前的彩條測試 top，用來確認 EGO1 VGA 輸出、VGA to HDMI 轉換器與擷取卡能正常顯示畫面。
-
-rtl/vga_renderer.v  
-根據目前 pixel 座標與 game logic 訊號決定 RGB 輸出，畫出 bird、pipes、ground 和遊戲狀態。
-
-rtl/top_vga.v  
-最終 VGA 版本 top module，整合 button control、game logic、VGA sync 和 renderer。
-
-## VGA 顯示規劃
-
-VGA 目標採用簡潔但完整的矩形風格，避免過度複雜的 sprite 或圖片 ROM，確保可以在專題時程內完成並穩定上板。
-
-預計畫面元素：
-
-- 背景：淺藍色天空
-- 地板：底部固定高度的 ground
-- 鳥：黃色 pixel-art 造型，包含黑色邊框、橘色嘴巴、白色眼睛、黑色瞳孔與深黃色翅膀
-- 管子：綠色上下矩形，中間保留 gap
-- IDLE：用文字顯示 START
-- PLAY：正常遊戲畫面
-- GAME_OVER：用文字顯示 GAME / OVER
-
-renderer 核心邏輯會使用座標範圍判斷，例如：
-
-```verilog
-if (pixel is inside bird)
-    draw yellow;
-else if (pixel is inside pipe)
-    draw green;
-else if (pixel is inside ground)
-    draw ground color;
-else
-    draw sky color;
+```text
+rtl/top_vga.v               最終 top module
+rtl/vga_sync.v              VGA timing
+rtl/vga_renderer.v          遊戲畫面繪製
+rtl/game_fsm.v              IDLE / PLAY / GAME_OVER 狀態機
+rtl/bird_ctrl.v             小鳥位置控制
+rtl/pipe_ctrl.v             管子移動與回收
+rtl/collision.v             碰撞判斷
+rtl/score_ctrl.v            分數計算
+rtl/button_ctrl.v           板上按鍵去彈跳 / pulse
+constraints/ego1_vga.xdc    EGO1 VGA 最終約束檔
+scripts/build_top_vga_flat.tcl
+docs/signal_spec.md
+docs/progress_log.md
 ```
 
-這種方式可綜合、容易除錯，也適合 FPGA 小專題展示。
+`rtl/keypad_ctrl.v` 保留作為 keypad 掃描模組紀錄，但目前最終 top 不使用它。
 
-## Simulation
+## Build
 
-simulation testbench 放在：
+目前最終 build 目錄放在 D 槽：
 
-sim/tb_top.v
+```text
+D:\ego1_top_vga_build
+```
 
-目前 testbench 已經確認：
+Vivado batch build 指令：
 
-- reset 後進入 IDLE
-- 按 start 後進入 PLAY
-- bird_y 會變化
-- pipe_x 會移動
-- collision 發生後進入 GAME_OVER
+```powershell
+D:\Xilinx\Vivado\2017.2\bin\vivado.bat -mode batch -source build_top_vga.tcl -log build.log -journal build.jou
+```
 
-後續 VGA 整合後，建議新增或擴充測試：
+workdir：
 
-- VGA counter 是否產生正確 h_count / v_count
-- video_on 是否只在可視區域內為 1
-- renderer 在指定座標是否輸出正確顏色
-- top_vga 是否能接上現有 game logic 訊號
+```text
+D:\ego1_top_vga_build
+```
 
-## Constraints
+最終 bitstream：
 
-constraints/ego1_led_test.xdc  
-這份是 LED 上板測試用的 XDC，只支援以下 top-level ports：
+```text
+D:\ego1_top_vga_build\bitstream\top_vga.bit
+```
 
-- clk
-- rst
-- btnC
-- btnU
-- led[3:0]
+## Demo 檢查
 
-constraints/ego1_vga_reference.xdc  
-這份是給 VGA 整合時參考腳位用的 XDC。
-
-建議 VGA top port 命名如下：
-
-- vga_r[3:0]
-- vga_g[3:0]
-- vga_b[3:0]
-- vga_hsync
-- vga_vsync
-
-如果 VGA 模組的 port 名稱不同，XDC 裡面的 get_ports 名稱也要一起改。
-
-## EGO1 LED 上板測試結果
-
-按鍵對應：
-
-- S4：reset
-- S0：start
-- S2：flap
-
-LED 對應：
-
-- LD0：game_state[0]
-- LD1：game_state[1]
-- LD2：dead
-- LD3：btnU
-
-實際測試結果：
-
-- 按 S4 reset 後 LED 全暗
-- 按 S0 start 後 LD0 亮，代表進入 PLAY
-- 過一段時間後 LD1 和 LD2 亮，代表進入 GAME_OVER 且 dead = 1
-- 按住 S2 時 LD3 亮，放開 S2 後 LD3 熄滅
-
-這代表 game logic 已經能在 EGO1 板上正常運作。
-
-## 重要提醒：目前有兩個 top 版本
-
-### top_debug.v
-
-用途：
-
-- simulation
-- 觀察 game logic 訊號
-- 後續 VGA renderer 整合
-
-這版會輸出比較多 debug 訊號，例如：
-
-- game_state
-- dead
-- score
-- bird_x
-- bird_y
-- pipe1_x
-- pipe1_gap_y
-- pipe2_x
-- pipe2_gap_y
-- pipe3_x
-- pipe3_gap_y
-
-注意：這版不能直接搭配 ego1_led_test.xdc 上板，因為它有很多額外 top-level output，XDC 沒有綁那些腳位。
-
-### top_board_led_test.v
-
-用途：
-
-- EGO1 LED 上板測試
-
-這版 top-level ports 只有：
-
-- clk
-- rst
-- btnC
-- btnU
-- led[3:0]
-
-這版可以搭配 constraints/ego1_led_test.xdc 使用。
-
-### top_vga.v
-
-用途：
-
-- 最終 VGA 遊戲展示版本
-- 整合 game logic 與 VGA 顯示
-
-這版包含：
-
-- clk
-- keypad_row[3:0]
-- keypad_col[3:0]
-- vga_r[3:0]
-- vga_g[3:0]
-- vga_b[3:0]
-- vga_hsync
-- vga_vsync
-
-## GAME_TICK_MAX 設定
-
-simulation 用：
-
-GAME_TICK_MAX = 21'd99
-
-上板用：
-
-GAME_TICK_MAX = 21'd1666665
-
-原因是 EGO1 的 clock 是 100 MHz。上板時要讓遊戲邏輯大約以 60 Hz 更新，所以使用 21'd1666665。simulation 時為了加快測試，會改成 21'd99。
-
-## VGA 整合需要的 game logic 訊號
-
-VGA renderer 後續需要接以下訊號：
-
-- game_state
-- dead
-- score
-- bird_x
-- bird_y
-- pipe1_x
-- pipe1_gap_y
-- pipe2_x
-- pipe2_gap_y
-- pipe3_x
-- pipe3_gap_y
-
-詳細訊號說明請看：
-
-docs/signal_spec.md
-
-目前進度紀錄請看：
-
-docs/progress_log.md
-
-VGA 腳位參考請看：
-
-constraints/ego1_vga_reference.xdc
-
-constraints/ego1_vga_color_test.xdc
-
-這份是 VGA 彩條測試 top 的正式 XDC，可搭配 top_vga_color_test.v 先做上板畫面測試。
-
-## 兩週內完成策略
-
-為了確保專題可以完整收斂，優先完成必要功能，再做加分項。
-
-必要功能：
-
-- vga_sync.v 產生穩定 VGA timing（已完成 simulation）
-- top_vga_color_test.v 產生 VGA 彩條測試畫面（已通過 synthesis / implementation / bitstream / board test）
-- vga_renderer.v 畫出天空、地板、鳥、管子（已完成 first-pass）
-- top_vga.v 整合現有 game logic 與 VGA 顯示（已完成 bitstream）
-- IDLE / PLAY / GAME_OVER 都能在畫面上被分辨
-- 實際上板測試可操作、可顯示、可 Game Over
-
-加分功能：
-
-- 鳥和水管加邊框，讓畫面更清楚
-- 左上角顯示兩位數分數
-- 背景加入簡單雲朵，地板加入紋理線條
-- 管子加入亮邊，讓障礙物更有層次
-- IDLE / GAME_OVER 狀態改用文字顯示
-- 分數規則改成每通過 3 根管子加 5 分，避免突然暴增
-- GAME_OVER 畫面加簡單提示
-
-## 下一步
-
-下一階段主要是上板驗證新版加分畫面與遊戲手感。VGA to HDMI 轉換器與擷取卡已確認可以收到 EGO1 輸出的彩條畫面，top_vga 也已能顯示遊戲場景。
-
-建議實作順序：
-
-1. 確認 4x4 keypad 接到 EGO1 哪一組 header / 腳位
-2. 將 keypad_row[3:0] 與 keypad_col[3:0] 的 PACKAGE_PIN 補進 constraints/ego1_vga.xdc
-3. 重新產生 C:/ego1_top_vga_build/bitstream/top_vga.bit
-4. 確認 OBS 畫面中 START 與 GAME / OVER 文字是否正常
-5. 測試 1 = start、5 = flap、D = reset
-6. 確認分數是否每通過 3 根管子才加 5 分
-
-目前 game logic 端已經完成第一階段，可以開始和 VGA 顯示端對接。
+1. 燒錄 `D:\ego1_top_vga_build\bitstream\top_vga.bit`
+2. 確認 VGA 畫面出現 START
+3. 按 S0 進入遊戲
+4. 按 S2 控制小鳥跳躍
+5. 確認通過管子後分數為 `01 -> 02 -> 07 -> 08 -> 09 -> 14`
+6. 撞到管子或地板後顯示 GAME / OVER
