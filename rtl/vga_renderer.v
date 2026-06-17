@@ -128,6 +128,7 @@ module vga_renderer(
         reg right_bot;
         reg diag_left;
         reg diag_right;
+        reg r_leg;
         begin
             top_seg   = (dy < 10'd5) && (dx >= 10'd5) && (dx < 10'd23);
             mid_seg   = (dy >= 10'd15) && (dy < 10'd20) && (dx >= 10'd5) && (dx < 10'd23);
@@ -138,12 +139,17 @@ module vga_renderer(
             right_bot = (dx >= 10'd23) && (dx < 10'd28) && (dy >= 10'd18) && (dy < 10'd31);
             diag_left = (dx >= 10'd7) && (dx < 10'd12) && (dy >= 10'd5) && (dy < 10'd31);
             diag_right = (dx >= 10'd16) && (dx < 10'd21) && (dy >= 10'd5) && (dy < 10'd31);
+            r_leg =
+                ((dy >= 10'd20) && (dy < 10'd24) && (dx >= 10'd11) && (dx < 10'd16)) ||
+                ((dy >= 10'd24) && (dy < 10'd28) && (dx >= 10'd14) && (dx < 10'd19)) ||
+                ((dy >= 10'd28) && (dy < 10'd32) && (dx >= 10'd17) && (dx < 10'd22)) ||
+                ((dy >= 10'd32) && (dy < 10'd36) && (dx >= 10'd20) && (dx < 10'd28));
 
             case (letter)
                 4'd0: letter_pixel = top_seg || mid_seg || bot_seg || left_top || right_bot; // S
                 4'd1: letter_pixel = top_seg || ((dx >= 10'd12) && (dx < 10'd17) && (dy < 10'd36)); // T
                 4'd2: letter_pixel = top_seg || mid_seg || left_top || left_bot || right_top || right_bot; // A
-                4'd3: letter_pixel = top_seg || mid_seg || left_top || right_top || right_bot || left_bot; // R
+                4'd3: letter_pixel = top_seg || mid_seg || left_top || left_bot || right_top || r_leg; // R
                 4'd4: letter_pixel = top_seg || bot_seg || left_top || left_bot || right_bot || mid_seg; // G
                 4'd5: letter_pixel = left_top || left_bot || right_top || right_bot || top_seg || diag_left || diag_right; // M
                 4'd6: letter_pixel = top_seg || mid_seg || bot_seg || left_top || left_bot; // E

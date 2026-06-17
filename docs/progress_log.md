@@ -17,6 +17,11 @@ Latest score rule update:
 - The same 1, 1, 5 pattern repeats for later pipes.
 - Pipe pass detection still uses previous/current pipe right-edge positions to avoid repeated scoring on the same pipe.
 
+Latest VGA text update:
+
+- The START and GAME OVER text now uses a distinct R glyph.
+- R keeps the upper bowl and adds a lower diagonal leg, so it no longer looks like A.
+
 ## Completed Modules
 
 - button_ctrl.v
