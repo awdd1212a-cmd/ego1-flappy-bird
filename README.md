@@ -41,6 +41,58 @@ docs/progress_log.md
 
 `rtl/keypad_ctrl.v` 保留作為 keypad 掃描模組紀錄，但目前最終 top 不使用它。
 
+## 系統總覽
+
+```mermaid
+flowchart LR
+    subgraph Input["EGO1 板上按鍵"]
+        S4["S4 Reset"]
+        S0["S0 Start"]
+        S2["S2 Flap"]
+    end
+
+    subgraph Top["top_vga.v"]
+        BTN["button_ctrl.v\n按鍵去彈跳與 pulse 產生"]
+        TICK["game_tick\n約 60 Hz 遊戲更新節拍"]
+    end
+
+    subgraph Logic["遊戲邏輯"]
+        FSM["game_fsm.v\nIDLE / PLAY / GAME_OVER"]
+        BIRD["bird_ctrl.v\n小鳥位置與跳躍"]
+        PIPE["pipe_ctrl.v\n管子移動與回收"]
+        COLL["collision.v\n管子/地板/邊界碰撞"]
+        SCORE["score_ctrl.v\n通過管子計分\n+1, +1, +5 循環"]
+    end
+
+    subgraph VGA["VGA 顯示"]
+        SYNC["vga_sync.v\n640x480 VGA timing"]
+        RENDER["vga_renderer.v\n天空/小鳥/管子/文字/分數繪製"]
+        OUT["VGA Port\nvga_r/g/b, hsync, vsync"]
+    end
+
+    S4 --> BTN
+    S0 --> BTN
+    S2 --> BTN
+    BTN --> FSM
+    BTN --> BIRD
+    TICK --> BIRD
+    TICK --> PIPE
+    TICK --> SCORE
+    FSM --> BIRD
+    FSM --> PIPE
+    FSM --> SCORE
+    BIRD --> COLL
+    PIPE --> COLL
+    COLL --> FSM
+    PIPE --> SCORE
+    FSM --> RENDER
+    BIRD --> RENDER
+    PIPE --> RENDER
+    SCORE --> RENDER
+    SYNC --> RENDER
+    RENDER --> OUT
+```
+
 ## Build
 
 目前最終 build 目錄放在 D 槽：
