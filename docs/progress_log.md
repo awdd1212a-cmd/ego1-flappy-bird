@@ -25,7 +25,7 @@ Latest VGA text update:
 Latest keypad debug update:
 
 - Added a standalone J5 keypad probe top.
-- The probe scans J5-1 through J5-32 one pin at a time.
+- The probe uses SW1/SW0 to scan one 8-pin J5 bank at a time.
 - Pressed keys are reported as two connected J5 pin numbers on the 16 board LEDs.
 - This probe is only for mapping the external keypad board and does not change the playable top_vga design.
 

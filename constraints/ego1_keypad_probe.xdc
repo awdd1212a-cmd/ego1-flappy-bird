@@ -1,7 +1,7 @@
 # ============================================================
 # EGO1 J5 keypad probe constraints
 # top ports:
-# clk, rst, j5[31:0], led[15:0]
+# clk, rst, sw[1:0], j5[31:0], led[15:0]
 # ============================================================
 
 # Clock: 100 MHz
@@ -12,6 +12,11 @@ create_clock -period 10.000 -name sys_clk [get_ports clk]
 # Reset button: S4
 set_property PACKAGE_PIN U4 [get_ports rst]
 set_property IOSTANDARD LVCMOS33 [get_ports rst]
+
+# Bank select switches
+set_property PACKAGE_PIN R1 [get_ports {sw[0]}]
+set_property PACKAGE_PIN N4 [get_ports {sw[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {sw[*]}]
 
 # LEDs D1_0..D1_7
 set_property PACKAGE_PIN K3 [get_ports {led[0]}]

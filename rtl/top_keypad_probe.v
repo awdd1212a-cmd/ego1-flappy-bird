@@ -1,6 +1,7 @@
 module top_keypad_probe(
     input  wire        clk,
     input  wire        rst,
+    input  wire [1:0]  sw,
     inout  wire [31:0] j5,
     output wire [15:0] led
 );
@@ -12,11 +13,15 @@ module top_keypad_probe(
     reg       hit_latched;
 
     wire scan_tick;
+    wire [4:0] scan_base;
+    wire [4:0] scan_pin;
     wire [31:0] low_mask;
     wire [31:0] sense_mask;
     wire any_hit;
 
     assign scan_tick = (div_cnt == 17'd0);
+    assign scan_base = {sw, 3'b000};
+    assign scan_pin = scan_base + scan_idx[2:0];
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -33,12 +38,12 @@ module top_keypad_probe(
     genvar i;
     generate
         for (i = 0; i < 32; i = i + 1) begin : g_j5_scan
-            assign j5[i] = (scan_idx == i[4:0]) ? 1'b0 : 1'bz;
+            assign j5[i] = (scan_pin == i[4:0]) ? 1'b0 : 1'bz;
         end
     endgenerate
 
     assign low_mask = ~j5;
-    assign sense_mask = low_mask & ~(32'h00000001 << scan_idx);
+    assign sense_mask = low_mask & ~(32'h00000001 << scan_pin);
     assign any_hit = (sense_mask != 32'd0);
 
     function [4:0] first_low_index;
@@ -86,7 +91,7 @@ module top_keypad_probe(
             sense_latched <= 5'd0;
             hit_latched <= 1'b0;
         end else if (scan_tick && any_hit) begin
-            drive_latched <= scan_idx;
+            drive_latched <= scan_pin;
             sense_latched <= first_low_index(sense_mask);
             hit_latched <= 1'b1;
         end

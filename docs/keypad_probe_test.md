@@ -11,7 +11,21 @@ D:\ego1_keypad_probe_build\bitstream\top_keypad_probe.bit
 ## Control
 
 - S4 resets and clears the latched result.
+- SW1/SW0 select which J5 bank is scanned.
 - Press one keypad key at a time.
+
+## Bank Select
+
+Only one 8-pin J5 bank is scanned at a time.
+
+```text
+SW1 SW0 = 00 scans J5-1  to J5-8
+SW1 SW0 = 01 scans J5-9  to J5-16
+SW1 SW0 = 10 scans J5-17 to J5-24
+SW1 SW0 = 11 scans J5-25 to J5-32
+```
+
+Try one bank, press S4, then press a keypad key. If the LED matrix flashes badly or the keypad does not latch a result, move to the next bank.
 
 ## LED Meaning
 
