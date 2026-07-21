@@ -1,5 +1,4 @@
 read_verilog {D:/ego1_top_vga_build/rtl/button_ctrl.v}
-read_verilog {D:/ego1_top_vga_build/rtl/keypad_ctrl.v}
 read_verilog {D:/ego1_top_vga_build/rtl/game_fsm.v}
 read_verilog {D:/ego1_top_vga_build/rtl/bird_ctrl.v}
 read_verilog {D:/ego1_top_vga_build/rtl/pipe_ctrl.v}

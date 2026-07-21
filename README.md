@@ -19,8 +19,6 @@
 | Start | S0 |
 | Flap | S2 |
 
-外接 NFU FPGA V2.0 keypad 擴充板因缺少該擴充板的 keypad 腳位表 / schematic / 範例 XDC，最終版不使用 keypad，避免 demo 不穩定。
-
 ## 主要檔案
 
 ```text
@@ -38,8 +36,6 @@ scripts/build_top_vga_flat.tcl
 docs/signal_spec.md
 docs/progress_log.md
 ```
-
-`rtl/keypad_ctrl.v` 保留作為 keypad 掃描模組紀錄，但目前最終 top 不使用它。
 
 ## 系統總覽
 

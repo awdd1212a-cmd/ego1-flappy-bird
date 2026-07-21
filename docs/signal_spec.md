@@ -43,17 +43,17 @@ Inputs from game logic:
 
 Current design:
 - bird_x = 100
-- bird size = 16 x 16
+- bird size = 24 x 24
 
 Renderer idea:
-- Draw the bird when pixel_x is between bird_x and bird_x + 16
-- Draw the bird when pixel_y is between bird_y and bird_y + 16
+- Draw the bird when pixel_x is between bird_x and bird_x + 24
+- Draw the bird when pixel_y is between bird_y and bird_y + 24
 
 ## Pipes
 
 Current design:
 - pipe width = 40
-- gap height = 120
+- gap height = 180
 
 Each pipe has:
 - pipeX_x: left x-coordinate of the pipe
@@ -69,12 +69,12 @@ Pipe signals:
 
 Gap range:
 - from pipeX_gap_y
-- to pipeX_gap_y + 120
+- to pipeX_gap_y + 180
 
 Renderer idea:
 - Draw pipe body when pixel_x is between pipeX_x and pipeX_x + 40
 - Do not draw pipe inside the gap area
-- Gap area is from pipeX_gap_y to pipeX_gap_y + 120
+- Gap area is from pipeX_gap_y to pipeX_gap_y + 180
 
 ## Ground
 
@@ -89,10 +89,10 @@ Renderer idea:
 
 - VGA width: 640
 - VGA height: 480
-- Bird size: 16 x 16
+- Bird size: 24 x 24
 - Bird x: 100
 - Pipe width: 40
-- Gap height: 120
+- Gap height: 180
 - Ground height: 40
 - Ground y start: 440
 
@@ -105,7 +105,7 @@ Recommended VGA output names:
 - vga_hsync
 - vga_vsync
 
-These names match constraints/ego1_vga_reference.xdc.
+These names match constraints/ego1_vga.xdc.
 
 ## VGA Sync Signals
 

@@ -10,8 +10,6 @@ Final control uses the EGO1 board buttons:
 - S0: Start
 - S2: Flap
 
-The external NFU FPGA V2.0 keypad board was investigated, but final demo keeps board-button control because the extension board's keypad pin mapping / schematic / example XDC is not available. This avoids unstable keypad behavior during presentation.
-
 ## Completed Features
 
 - VGA output through EGO1 VGA connector
@@ -52,7 +50,6 @@ Pipe 6: +5  -> 14
 - rtl/score_ctrl.v
 - rtl/vga_sync.v
 - rtl/vga_renderer.v
-- rtl/keypad_ctrl.v, retained for reference only and not used by final top_vga
 
 ## Final Constraint
 
